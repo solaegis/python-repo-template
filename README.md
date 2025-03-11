@@ -1,6 +1,6 @@
 # Python Repository Template
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen)](https://github.com/solaegis/python-repo-template/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/solaegis/python-repo-template)](https://github.com/solaegis/python-repo-template/blob/main/LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/downloads/)
 [![Build tool: Hatch](https://img.shields.io/badge/build%20tool-hatch-4051b5)](https://github.com/pypa/hatch)
 [![Package manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
@@ -31,6 +31,7 @@ A comprehensive and modern template for Python projects with best practices for 
 - [Git](https://git-scm.com/)
 - [Hatch](https://hatch.pypa.io/latest/) for project management
 - [uv](https://github.com/astral-sh/uv) for dependency resolution and management
+- [python-dotenv](https://github.com/theskumar/python-dotenv) for environment variable management
 
 ## 🔧 Getting Started
 
@@ -44,8 +45,16 @@ A comprehensive and modern template for Python projects with best practices for 
 
 ```bash
 # Clone your new repository
-git clone https://github.com/solaegis/python-repo-template.git your-new-repo
+git clone https://github.com/yourusername/your-new-repo.git
 cd your-new-repo
+
+# Set up your environment variables (copy the example first)
+cp .env.example .env
+# Edit .env with your project details
+nano .env  # or your preferred editor
+
+# Initialize the project structure with your package name from .env
+task hatch:init
 
 # Install dependencies using Hatch with uv backend
 hatch env create
@@ -56,6 +65,24 @@ uv pip install -e ".[dev]"
 # Set up pre-commit hooks
 pre-commit install
 ```
+
+### Environment Configuration
+
+This template uses `.env` files to configure your project. Before initializing, set the following variables in your `.env` file:
+
+```ini
+# Required
+PACKAGE_NAME=your_package_name  # The name of your Python package
+
+# Optional (defaults will be used if not specified)
+PACKAGE_DESCRIPTION="A brief description of your package"
+AUTHOR_NAME="Your Name"
+AUTHOR_EMAIL="your.email@example.com"
+LICENSE="MIT"
+PYTHON_VERSION=">=3.8"
+```
+
+An example `.env.example` file is provided in the repository as a reference.
 
 ## 📁 Project Structure
 
@@ -168,6 +195,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📫 Contact
+
+Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
 
 Project Link: [https://github.com/solaegis/python-repo-template](https://github.com/solaegis/python-repo-template)
 
