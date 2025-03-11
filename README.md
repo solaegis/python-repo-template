@@ -1,6 +1,6 @@
 # Python Repository Template
 
-[![License](https://img.shields.io/github/license/solaegis/python-repo-template)](https://github.com/solaegis/python-repo-template/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-brightgreen)](https://github.com/solaegis/python-repo-template/blob/main/LICENSE)
 [![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/downloads/)
 [![Build tool: Hatch](https://img.shields.io/badge/build%20tool-hatch-4051b5)](https://github.com/pypa/hatch)
 [![Package manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
