@@ -48,8 +48,7 @@ tasks:
     cmds:
       - "mkdir -p src/{{.PACKAGE_NAME}} tests docs .github/workflows"
       - "touch src/{{.PACKAGE_NAME}}/__init__.py tests/__init__.py docs/index.md .github/workflows/ci.yml"
-      - "curl -s -o .gitignore https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore"
-      - "hatch new --init --name '{{.PACKAGE_NAME}}'"
+      - "hatch new --init '{{.PACKAGE_NAME}}'"
 
   docs:build:
     desc: "Build documentation using Hatch."
