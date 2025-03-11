@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# https://taskfile.dev
+
+version: "3"
+
+dotenv: [".env"]
+
+vars:
+  CURRENT_DATE:
+    sh: date +"%Y-%m-%dT%H:%M:%S%Z"
+
+tasks:
+  default:
+    cmds:
+      - task: pre
+
+  hog:
+    cmds:
+      - trufflehog git file://. --since-commit HEAD --only-verified --fail
+
+  pre:
+    cmds:
+      - pre-commit autoupdate
+      - pre-commit run -a
+
+  push:
+    cmds:
+      - git add .
+      - git commit -m "{{.CURRENT_DATE}}"
+      - git push
+    silent: true
+
+  tag:
+    cmds:
+      - git push
+      - git tag -s {{.CLI_ARGS}} -m "{{.CLI_ARGS}}"
+      - git push --tags
+
+  clean:
+    desc: "Clean Python development environment."
+    cmds:
+      - find . -type d -name "__pycache__" -exec rm -r {} +
+      - find . -type f -name "*.pyc" -delete
+      - find . -type f -name "*.pyo" -delete
+
+  hatch_init:
+    desc: "Initialize a new Python package using hatch."
+    cmds:
+      - "mkdir -p src/{{.PACKAGE_NAME}} tests docs .github/workflows"
+      - "touch src/{{.PACKAGE_NAME}}/__init__.py tests/__init__.py docs/index.md .github/workflows/ci.yml"
+      - "curl -s -o .gitignore https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore"
+      - "hatch new --init --name '{{.PACKAGE_NAME}}'"

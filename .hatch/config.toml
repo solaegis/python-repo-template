@@ -1,0 +1,3 @@
+[env]
+type = "virtual"
+installer = "uv"
