@@ -3,6 +3,12 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
@@ -15,3 +21,23 @@ repos:
         entry: bash -c 'trufflehog git file://. --since-commit HEAD --no-verification --fail'
         language: system
         stages: ["pre-commit", "pre-push"]
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.3
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [--fail-under=80, --verbose]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.1
+    hooks:
+      - id: pyupgrade
+        args: [--py38-plus]

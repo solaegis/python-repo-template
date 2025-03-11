@@ -43,10 +43,20 @@ tasks:
       - find . -type f -name "*.pyc" -delete
       - find . -type f -name "*.pyo" -delete
 
-  hatch_init:
+  hatch:init:
     desc: "Initialize a new Python package using hatch."
     cmds:
       - "mkdir -p src/{{.PACKAGE_NAME}} tests docs .github/workflows"
       - "touch src/{{.PACKAGE_NAME}}/__init__.py tests/__init__.py docs/index.md .github/workflows/ci.yml"
       - "curl -s -o .gitignore https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore"
       - "hatch new --init --name '{{.PACKAGE_NAME}}'"
+
+  docs:build:
+    desc: "Build documentation using Hatch."
+    cmds:
+      - "hatch run docs:build"
+
+  docs:serve:
+    desc: "Serve documentation locally."
+    cmds:
+      - "hatch run docs:serve"
