@@ -1,207 +1,146 @@
-# Python Repository Template
+# Production Python Internal Tools Template
 
-[![License](https://img.shields.io/github/license/solaegis/python-repo-template)](https://github.com/solaegis/python-repo-template/blob/main/LICENSE)
-[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://www.python.org/downloads/)
-[![Build tool: Hatch](https://img.shields.io/badge/build%20tool-hatch-4051b5)](https://github.com/pypa/hatch)
-[![Package manager: uv](https://img.shields.io/badge/package%20manager-uv-black)](https://github.com/astral-sh/uv)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1)](https://pycqa.github.io/isort/)
-[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+A no-nonsense, production-ready Python template optimized for internal tooling.
 
-A comprehensive and modern template for Python projects with best practices for development, testing, and deployment.
+## Philosophy
 
-## 🚀 Features
+- **uv-first**: Fast, reliable dependency management
+- **Hatch only for publishing**: When you actually need PyPI distribution
+- **Taskfile for DX**: Consistent, discoverable developer commands
+- **Production-ready**: Logging, monitoring, error handling built-in
 
-- Modern Python project structure
-- Complete CI/CD pipeline using GitHub Actions
-- Testing framework with pytest
-- Type checking with mypy
-- Code formatting with Black and isort
-- Linting with flake8
-- Pre-commit hooks
-- Automated dependency management
-- Comprehensive documentation setup
-- Virtual environment management
-- Development containers for VSCode
-
-## 📋 Prerequisites
-
-- Python 3.8 or higher
-- [Git](https://git-scm.com/)
-- [Hatch](https://hatch.pypa.io/latest/) for project management
-- [uv](https://github.com/astral-sh/uv) for dependency resolution and management
-- [python-dotenv](https://github.com/theskumar/python-dotenv) for environment variable management
-
-## 🔧 Getting Started
-
-### Creating a New Repository
-
-1. Click the "Use this template" button at the top of this repository
-2. Name your repository and set visibility
-3. Click "Create repository from template"
-
-### Clone and Setup
+## Quick Start
 
 ```bash
-# Clone your new repository
-git clone https://github.com/yourusername/your-new-repo.git
-cd your-new-repo
+# 1. Use this template to create your repo
+# 2. Clone your new repo
+git clone <your-new-repo>
+cd your-tool
 
-# Set up your environment variables (copy the example first)
-cp .env.example .env
-# Edit .env with your project details
-nano .env  # or your preferred editor
+# 3. One command setup
+task setup
 
-# Initialize the project structure with your package name from .env
-task hatch:init
-
-# Install dependencies using Hatch with uv backend
-hatch env create
-
-# Or using uv directly
-uv pip install -e ".[dev]"
-
-# Set up pre-commit hooks
-pre-commit install
+# 4. Start developing
+task dev
 ```
 
-### Environment Configuration
+## Template Usage
 
-This template uses `.env` files to configure your project. Before initializing, set the following variables in your `.env` file:
+When creating from this template:
 
-```ini
+1. **Replace placeholders**: Search and replace `{{PACKAGE_NAME}}` with your tool name
+2. **Update metadata**: Edit `pyproject.toml` with your details
+3. **Configure environment**: Copy `.env.example` to `.env.local`
+4. **Initialize**: Run `task setup`
+
+## Structure
+
+```
+├── .github/workflows/     # Streamlined CI/CD
+├── src/{{PACKAGE_NAME}}/  # Your source code
+├── tests/                 # Test suite
+├── docker/               # Container definitions
+├── scripts/              # Deployment scripts
+├── Taskfile.yaml         # Developer commands
+├── pyproject.toml        # Project configuration
+└── README.md            # This file
+```
+
+## Features
+
+### For Developers
+- **Fast setup**: `task setup` gets you productive in <2 minutes
+- **Live reload**: `task dev` for development with auto-restart
+- **Quality tools**: Ruff, mypy, pytest with sensible defaults
+- **Pre-commit hooks**: Catch issues before they hit CI
+
+### For Operations
+- **Health checks**: Built-in endpoint monitoring
+- **Structured logging**: JSON logs with correlation IDs
+- **Error tracking**: Sentry integration ready
+- **Container ready**: Production Docker images
+- **Security scanning**: Vulnerability detection in CI
+
+### For Teams
+- **Consistent commands**: Same `task` commands across all projects
+- **Fast CI**: <2 minute feedback loop
+- **Security first**: Secret scanning, dependency auditing
+- **Documentation**: Runbooks and deployment guides included
+
+## Commands
+
+```bash
+# Development
+task setup              # Initial setup
+task dev               # Run in development mode
+task test              # Run test suite
+task lint              # Format and lint code
+
+# Operations  
+task build             # Build for production
+task docker:build      # Build container
+task security:scan     # Run security checks
+
+# Deployment
+task deploy:staging    # Deploy to staging
+task deploy:prod       # Deploy to production
+```
+
+## Configuration
+
+Environment variables in `.env.local`:
+
+```bash
 # Required
-PACKAGE_NAME=your_package_name  # The name of your Python package
+TOOL_NAME=your-tool
+ENVIRONMENT=development
 
-# Optional (defaults will be used if not specified)
-PACKAGE_DESCRIPTION="A brief description of your package"
-AUTHOR_NAME="Your Name"
-AUTHOR_EMAIL="your.email@example.com"
-LICENSE="MIT"
-PYTHON_VERSION=">=3.8"
+# Optional
+LOG_LEVEL=INFO
+SENTRY_DSN=https://...
+DATABASE_URL=postgresql://...
 ```
 
-An example `.env.example` file is provided in the repository as a reference.
+## Anti-Patterns This Template Avoids
 
-## 📁 Project Structure
+❌ **Complex Hatch environments** - Use uv for dependency management
+❌ **Testing 5 Python versions** - Focus on what you actually deploy  
+❌ **Over-engineered packaging** - Internal tools don't need PyPI complexity
+❌ **Missing operational features** - Production needs monitoring, not just tests
 
-```
-├── .github/            # GitHub Actions workflows
-├── docs/               # Documentation
-├── src/                # Source code
-│   └── your_package/   # Your package (rename this)
-├── tests/              # Test suite
-├── .pre-commit-config.yaml  # Pre-commit hooks configuration
-├── pyproject.toml      # Project configuration (Hatch and uv settings)
-├── README.md           # This file
-└── LICENSE             # License file
-```
+## When to Use This Template
 
-## ⚙️ Configuration
+✅ **Perfect for:**
+- Internal CLI tools
+- Data processing pipelines  
+- Automation scripts
+- API clients and integrations
+- Development utilities
 
-### Renaming the Package
+❌ **Not ideal for:**
+- Public PyPI packages (use full Hatch setup)
+- Web applications (use FastAPI/Django templates)
+- Libraries meant for distribution
+- Complex multi-package projects
 
-1. Rename the `src/your_package` directory to your desired package name
-2. Update references in:
-   - `pyproject.toml`
-   - `tests/`
-   - `.github/workflows/`
+## Migration from Complex Templates
 
-### Setting Up Environment Variables
+If migrating from over-engineered setups:
 
-For sensitive information, use GitHub Secrets:
+1. **Audit dependencies** - Remove unused dev tools
+2. **Simplify CI** - Focus on fast feedback
+3. **Add monitoring** - Logging, health checks, metrics
+4. **Document operations** - Deployment, troubleshooting
 
-1. Go to your repository settings
-2. Navigate to Secrets and Variables > Actions
-3. Add necessary secrets for workflows
+## Support
 
-## 🧪 Development Workflow
+This template is designed for teams with mid-level+ Python experience. Key assumptions:
 
-### Running Tests
-
-```bash
-# Run all tests using Hatch
-hatch run test
-
-# Run with coverage report
-hatch run test:cov
-```
-
-### Formatting and Linting
-
-```bash
-# Format code using Hatch
-hatch run lint:fmt
-
-# Run linting
-hatch run lint:check
-hatch run lint:typing
-```
-
-### Pre-commit Hooks
-
-Pre-commit hooks run automatically on commit. To run manually:
-
-```bash
-pre-commit run --all-files
-```
-
-## 📦 Releasing
-
-This template supports automated releasing using GitHub Actions and Hatch:
-
-1. Create a new tag following semantic versioning
-2. Push the tag to GitHub
-3. The release workflow will:
-   - Run tests
-   - Build the package using Hatch
-   - Publish to PyPI (if configured)
-   - Create a GitHub Release
-
-```bash
-# Example of creating and pushing a tag
-git tag -a v0.1.0 -m "Initial release"
-git push origin v0.1.0
-
-# Manual build using Hatch (for local testing)
-hatch build
-```
-
-## 📚 Documentation
-
-Documentation is generated using [MkDocs](https://www.mkdocs.org/) with the [Material theme](https://squidfunk.github.io/mkdocs-material/), managed through Hatch environments.
-
-```bash
-# Build documentation using Hatch
-hatch run docs:build
-
-# Serve documentation locally
-hatch run docs:serve
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📫 Contact
-
-Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
-
-Project Link: [https://github.com/solaegis/python-repo-template](https://github.com/solaegis/python-repo-template)
+- You understand virtual environments and dependency management
+- You have basic Docker knowledge for deployments
+- You want operational excellence over packaging perfection
+- You prefer explicit configuration over magic
 
 ---
 
-<p align="center">
-  <i>If you found this template useful, please consider giving it a ⭐️!</i>
-</p>
+**Bottom line**: Ship reliable internal tools fast, not perfect packages slow.

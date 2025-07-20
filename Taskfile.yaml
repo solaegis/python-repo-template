@@ -1,61 +1,161 @@
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-# https://taskfile.dev
-
 version: "3"
 
-dotenv: [".env"]
+dotenv: [".env.local", ".env"]
 
 vars:
-  CURRENT_DATE:
-    sh: date +"%Y-%m-%dT%H:%M:%S%Z"
+  PYTHON_VERSION: "3.10"
+  VENV_DIR: ".venv"
+  SRC_DIR: "src"
+  TESTS_DIR: "tests"
+
+env:
+  UV_CACHE_DIR: "{{.HOME}}/.cache/uv"
+  TOOL_NAME: "{{PACKAGE_NAME}}"
 
 tasks:
   default:
+    desc: "Show available tasks"
     cmds:
-      - task: pre
+      - task --list-all
 
-  hog:
+  # Setup and installation
+  setup:
+    desc: "Complete project setup for new developers"
     cmds:
-      - trufflehog git file://. --since-commit HEAD --only-verified --fail
+      - task: install
+      - task: pre-commit:install
+      - task: env:create
+      - echo "✅ Setup complete! Run 'task dev' to start developing"
 
-  pre:
+  install:
+    desc: "Install dependencies with uv"
     cmds:
-      - pre-commit autoupdate
-      - pre-commit run -a
+      - uv sync --all-extras
+    sources:
+      - pyproject.toml
+      - uv.lock
+    generates:
+      - "{{.VENV_DIR}}/pyvenv.cfg"
 
-  push:
+  # Development
+  dev:
+    desc: "Run tool in development mode with auto-reload"
+    deps: [install]
     cmds:
-      - git add .
-      - git commit -m "{{.CURRENT_DATE}}"
-      - git push
-    silent: true
+      - uv run python -m {{PACKAGE_NAME}}.cli {{.CLI_ARGS}}
+    interactive: true
 
-  tag:
+  # Testing
+  test:
+    desc: "Run test suite"
+    deps: [install]
     cmds:
-      - git push
-      - git tag -s {{.CLI_ARGS}} -m "{{.CLI_ARGS}}"
-      - git push --tags
+      - uv run pytest {{.CLI_ARGS}}
 
+  test:cov:
+    desc: "Run tests with coverage report"
+    deps: [install]
+    cmds:
+      - uv run pytest --cov-report=html --cov-report=term
+      - echo "Coverage report: file://$(pwd)/htmlcov/index.html"
+
+  # Code quality
+  lint:
+    desc: "Format and lint code"
+    deps: [install]
+    cmds:
+      - uv run ruff format {{.SRC_DIR}} {{.TESTS_DIR}}
+      - uv run ruff check --fix {{.SRC_DIR}} {{.TESTS_DIR}}
+
+  lint:check:
+    desc: "Check code formatting and linting (CI mode)"
+    deps: [install]
+    cmds:
+      - uv run ruff format --check {{.SRC_DIR}} {{.TESTS_DIR}}
+      - uv run ruff check {{.SRC_DIR}} {{.TESTS_DIR}}
+
+  type:
+    desc: "Run type checking"
+    deps: [install]
+    cmds:
+      - uv run mypy {{.SRC_DIR}}
+
+  check:
+    desc: "Run all code quality checks"
+    cmds:
+      - task: lint:check
+      - task: type
+      - task: test
+
+  # Pre-commit
+  pre-commit:install:
+    desc: "Install pre-commit hooks"
+    cmds:
+      - uv run pre-commit install
+
+  # Security
+  security:scan:
+    desc: "Run security scans"
+    deps: [install]
+    cmds:
+      - uv run bandit -r {{.SRC_DIR}}
+      - uv run safety check
+
+  # Dependencies
+  deps:update:
+    desc: "Update dependencies"
+    cmds:
+      - uv lock --upgrade
+      - echo "✅ Dependencies updated. Review uv.lock changes."
+
+  # Build and packaging (only when needed)
+  build:
+    desc: "Build distribution packages"
+    cmds:
+      - rm -rf dist/
+      - uv run hatch build
+      - echo "✅ Built packages in dist/"
+
+  # Docker
+  docker:build:
+    desc: "Build Docker image"
+    cmds:
+      - docker build -t {{PACKAGE_NAME}}:latest -f docker/Dockerfile .
+
+  docker:run:
+    desc: "Run Docker container"
+    deps: [docker:build]
+    cmds:
+      - docker run --rm -it {{PACKAGE_NAME}}:latest {{.CLI_ARGS}}
+
+  # Environment management
+  env:create:
+    desc: "Create .env.local from template"
+    cmds:
+      - |
+        if [ ! -f .env.local ]; then
+          cp .env.example .env.local
+          echo "✅ Created .env.local - please edit with your settings"
+        else
+          echo "⚠️  .env.local already exists"
+        fi
+    status:
+      - test -f .env.local
+
+  # Cleanup
   clean:
-    desc: "Clean Python development environment."
+    desc: "Clean build artifacts and caches"
     cmds:
-      - find . -type d -name "__pycache__" -exec rm -r {} +
-      - find . -type f -name "*.pyc" -delete
-      - find . -type f -name "*.pyo" -delete
+      - rm -rf dist/ build/ *.egg-info/
+      - rm -rf .pytest_cache/ .coverage htmlcov/
+      - rm -rf .mypy_cache/ .ruff_cache/
+      - find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+      - find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
-  hatch:init:
-    desc: "Initialize a new Python package using hatch."
+  clean:all:
+    desc: "Clean everything including virtual environment"
     cmds:
-      - "mkdir -p src/{{.PACKAGE_NAME}} tests docs .github/workflows"
-      - "touch src/{{.PACKAGE_NAME}}/__init__.py tests/__init__.py docs/index.md .github/workflows/ci.yml"
-      - "hatch new --init '{{.PACKAGE_NAME}}'"
-
-  docs:build:
-    desc: "Build documentation using Hatch."
-    cmds:
-      - "hatch run docs:build"
-
-  docs:serve:
-    desc: "Serve documentation locally."
-    cmds:
-      - "hatch run docs:serve"
+      - task: clean
+      - rm -rf {{.VENV_DIR}}
+      - uv cache clean
